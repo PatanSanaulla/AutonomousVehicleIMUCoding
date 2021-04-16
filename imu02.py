@@ -54,7 +54,20 @@ def forward(maxTicks):
 
     while True:
         #print("counterBR = ", counterBR,"counterFL = ", counterFL, "BR state: ", gpio.input(12), "FL state: ", gpio.input(7))
-        file.write(str(counterBR)+","+str(counterFL)+","+str(gpio.input(12))+","+str(gpio.input(7))+'\n')
+        #file.write(str(counterBR)+","+str(counterFL)+","+str(gpio.input(12))+","+str(gpio.input(7))+'\n')
+        
+        #Read serial stream
+        line = ser.readline() #print(line)
+        line = line.rstrip().lstrip()
+        line = str(line)
+        line = line.strip("'")
+        line = line.strip("b'")
+        #print(line)
+        
+        #Return float
+        currAngle = float(line)
+        file.write(str(currAngle)+'\n')
+        
         if int(gpio.input(12)) != int(buttonBR):
             buttonBR = int(gpio.input(12))
             counterBR += 1
@@ -96,7 +109,20 @@ def reverse(maxTicks):
 
     while True:
         #print("counterBR = ", counterBR,"counterFL = ", counterFL, "BR state: ", gpio.input(12), "FL state: ", gpio.input(7))
-        file.write(str(counterBR)+","+str(counterFL)+","+str(gpio.input(12))+","+str(gpio.input(7))+'\n')
+        #file.write(str(counterBR)+","+str(counterFL)+","+str(gpio.input(12))+","+str(gpio.input(7))+'\n')
+        
+        #Read serial stream
+        line = ser.readline() #print(line)
+        line = line.rstrip().lstrip()
+        line = str(line)
+        line = line.strip("'")
+        line = line.strip("b'")
+        #print(line)
+        
+        #Return float
+        currAngle = float(line)
+        file.write(str(currAngle)+'\n')
+        
         if int(gpio.input(12)) != int(buttonBR):
             buttonBR = int(gpio.input(12))
             counterBR += 1
@@ -162,7 +188,7 @@ def pivotright(angle):#maxTicks):
         
         #Return float
         currAngle = float(line)
-        print(currAngle)
+        file.write(str(currAngle)+'\n')
         
         #file.write(str(counterBR)+","+str(counterFL)+","+str(gpio.input(12))+","+str(gpio.input(7))+'\n')
         if int(gpio.input(12)) != int(buttonBR):
@@ -224,7 +250,7 @@ def pivotleft(angle):#maxTicks):
         
         #Return float
         currAngle = float(line)
-        print(currAngle)
+        file.write(str(currAngle)+'\n')
         
         #file.write(str(counterBR)+","+str(counterFL)+","+str(gpio.input(12))+","+str(gpio.input(7))+'\n')
         if int(gpio.input(12)) != int(buttonBR):
