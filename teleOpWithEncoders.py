@@ -6,11 +6,13 @@ import cv2
 import os
 import imutils
 import math
+import serial
 
 trig = 16
 echo = 18
 file = open("onlyEncoder.txt",'a')
-
+#Indentify serial communication
+ser = serial.Serial('/dev/ttyUSB0', 9600)
 ##### INit the pins
 
 def init():
@@ -52,7 +54,8 @@ def forward(maxTicks):
 
     while True:
         #print("counterBR = ", counterBR,"counterFL = ", counterFL, "BR state: ", gpio.input(12), "FL state: ", gpio.input(7))
-        file.write(str(counterBR)+","+str(counterFL)+","+str(gpio.input(12))+","+str(gpio.input(7))+'\n')
+        #file.write(str(counterBR)+","+str(counterFL)+","+str(gpio.input(12))+","+str(gpio.input(7))+'\n')
+        
         if int(gpio.input(12)) != int(buttonBR):
             buttonBR = int(gpio.input(12))
             counterBR += 1
@@ -72,20 +75,18 @@ def forward(maxTicks):
             pwm1.stop()
             pwm2.stop()
             gameover()
+            #Read serial stream
+            line = ser.readline() #print(line)
+            line = line.rstrip().lstrip()
+            line = str(line)
+            line = line.strip("'")
+            line = line.strip("b'")
+            #print(line)
+        
+            #Return float
+            currAngle = float(line)
+            file.write(str(currAngle)+','+str(maxTicks/98)+'\n')
             break
-
-    # init()
-    # # Left wheels
-    # gpio.output(31, True) 
-    # GPIO.output(33, False) 
-    # # Right wheels
-    # GPIO.output(35, False) 
-    # GPIO.output(37, True) 
-    # # Wait
-    # time.sleep(tf)
-    # # Set all pins low and cleanup
-    # gameover()
-    # GPIO.cleanup()
 
 
 def reverse(maxTicks):
@@ -107,7 +108,8 @@ def reverse(maxTicks):
 
     while True:
         #print("counterBR = ", counterBR,"counterFL = ", counterFL, "BR state: ", gpio.input(12), "FL state: ", gpio.input(7))
-        file.write(str(counterBR)+","+str(counterFL)+","+str(gpio.input(12))+","+str(gpio.input(7))+'\n')
+        #file.write(str(counterBR)+","+str(counterFL)+","+str(gpio.input(12))+","+str(gpio.input(7))+'\n')
+        
         if int(gpio.input(12)) != int(buttonBR):
             buttonBR = int(gpio.input(12))
             counterBR += 1
@@ -127,18 +129,18 @@ def reverse(maxTicks):
             pwm1.stop()
             pwm2.stop()
             gameover()
+            #Read serial stream
+            line = ser.readline() #print(line)
+            line = line.rstrip().lstrip()
+            line = str(line)
+            line = line.strip("'")
+            line = line.strip("b'")
+            #print(line)
+        
+            #Return float
+            currAngle = float(line)
+            file.write(str(currAngle)+','+str(maxTicks/98)+'\n')
             break
-    # # Left wheels
-    # GPIO.output(31, False) 
-    # GPIO.output(33, True) 
-    # # Right wheels
-    # GPIO.output(35, True) 
-    # GPIO.output(37, False) 
-    # # Wait
-    # time.sleep(tf)
-    # # Set all pins low and cleanup
-    # gameover()
-    # GPIO.cleanup()
 
 
 def pivotright(maxTicks):
@@ -168,30 +170,14 @@ def pivotright(maxTicks):
         if int(gpio.input(7)) != int(buttonFL):
             buttonFL = int(gpio.input(7))
             counterFL += 1
-            #print(counter)
-            
-        # if counterBR >= maxTicks:
-        #     pwm1.stop()
+
             
         if counterFL >= maxTicks:
-       #     pwm2.stop()
-            
-       # if counterFL >= maxTicks and counterBR >= maxTicks:
             pwm1.stop()
             pwm2.stop()
             gameover()
             break
-    # Left wheels
-    # GPIO.output(31, True)
-    # GPIO.output(33, False)
-    # # Right wheels
-    # GPIO.output(35, True)
-    # GPIO.output(37, False)
-    # # Wait
-    # time.sleep(tf)
-    # # Set all pins low and cleanup
-    # gameover()
-    # GPIO.cleanup()
+
 
 
 def pivotleft(maxTicks):
@@ -221,10 +207,6 @@ def pivotleft(maxTicks):
         if int(gpio.input(7)) != int(buttonFL):
             buttonFL = int(gpio.input(7))
             counterFL += 1
-            #print(counter)
-            
-        # if counterBR >= maxTicks:
-        #     pwm1.stop()
             
         if counterFL >= maxTicks:
             pwm1.stop()
@@ -232,22 +214,6 @@ def pivotleft(maxTicks):
             gameover()
             break
             
-        # if counterFL >= maxTicks and counterBR >= maxTicks:
-        #     pwm1.stop()
-        #     pwm2.stop()
-        #     gameover()
-        #     break
-    # # Left wheels
-    # GPIO.output(31, False)
-    # GPIO.output(33, True)
-    # # Right wheels
-    # GPIO.output(35, False)
-    # GPIO.output(37, True)
-    # # Wait
-    # time.sleep(tf)
-    # # Set all pins low and cleanup
-    # gameover()
-    # GPIO.cleanup()
     
 def closeGripper():
     gpio.setmode(gpio.BOARD)
@@ -361,6 +327,15 @@ if __name__ == '__main__':
 
     while True:
         key_press = input("Select driving mode: ")
+        read_trash = ser.readline()
+        line = ser.readline() #print(line)
+        line = line.rstrip().lstrip()
+        line = str(line)
+        line = line.strip("'")
+        line = line.strip("b'")
+    
+        currAngle = float(line)
+        file.write(str(currAngle)+','+'0.00'+'\n')
         if key_press == 'q':
             gpio.cleanup()
             file.close()
