@@ -9,7 +9,7 @@ import serial
 
 trig = 16
 echo = 18
-file = open("onlyEncoder.txt",'a')
+file = open("IMUData.txt",'a')
 #Indentify serial communication
 ser = serial.Serial('/dev/ttyUSB0', 9600)
 
@@ -56,18 +56,6 @@ def forward(maxTicks):
         #print("counterBR = ", counterBR,"counterFL = ", counterFL, "BR state: ", gpio.input(12), "FL state: ", gpio.input(7))
         #file.write(str(counterBR)+","+str(counterFL)+","+str(gpio.input(12))+","+str(gpio.input(7))+'\n')
         
-        #Read serial stream
-        line = ser.readline() #print(line)
-        line = line.rstrip().lstrip()
-        line = str(line)
-        line = line.strip("'")
-        line = line.strip("b'")
-        #print(line)
-        
-        #Return float
-        currAngle = float(line)
-        file.write(str(currAngle)+'\n')
-        
         if int(gpio.input(12)) != int(buttonBR):
             buttonBR = int(gpio.input(12))
             counterBR += 1
@@ -87,6 +75,18 @@ def forward(maxTicks):
             pwm1.stop()
             pwm2.stop()
             gameover()
+            #Read serial stream
+            line = ser.readline() #print(line)
+            line = line.rstrip().lstrip()
+            line = str(line)
+            line = line.strip("'")
+            line = line.strip("b'")
+            #print(line)
+        
+            #Return float
+            currAngle = float(line)
+            #file.write(str(currAngle)+'\n')
+            file.write(str(currAngle)+','+str(maxTicks/98)+'\n')
             break
 
 
@@ -111,18 +111,6 @@ def reverse(maxTicks):
         #print("counterBR = ", counterBR,"counterFL = ", counterFL, "BR state: ", gpio.input(12), "FL state: ", gpio.input(7))
         #file.write(str(counterBR)+","+str(counterFL)+","+str(gpio.input(12))+","+str(gpio.input(7))+'\n')
         
-        #Read serial stream
-        line = ser.readline() #print(line)
-        line = line.rstrip().lstrip()
-        line = str(line)
-        line = line.strip("'")
-        line = line.strip("b'")
-        #print(line)
-        
-        #Return float
-        currAngle = float(line)
-        file.write(str(currAngle)+'\n')
-        
         if int(gpio.input(12)) != int(buttonBR):
             buttonBR = int(gpio.input(12))
             counterBR += 1
@@ -142,6 +130,18 @@ def reverse(maxTicks):
             pwm1.stop()
             pwm2.stop()
             gameover()
+            #Read serial stream
+            line = ser.readline() #print(line)
+            line = line.rstrip().lstrip()
+            line = str(line)
+            line = line.strip("'")
+            line = line.strip("b'")
+            #print(line)
+        
+            #Return float
+            currAngle = float(line)
+            #file.write(str(currAngle)+'\n')
+            file.write(str(currAngle)+','+str(maxTicks/98)+'\n')
             break
 
 
@@ -172,7 +172,6 @@ def pivotright(angle):#maxTicks):
         
         #Return float
         goalAngle = (float(line) + angle)%360
-        print('Goal angle is '+str(goalAngle))
 
 
     while True:
@@ -188,7 +187,7 @@ def pivotright(angle):#maxTicks):
         
         #Return float
         currAngle = float(line)
-        file.write(str(currAngle)+'\n')
+        #file.write(str(currAngle)+'\n')
         
         #file.write(str(counterBR)+","+str(counterFL)+","+str(gpio.input(12))+","+str(gpio.input(7))+'\n')
         if int(gpio.input(12)) != int(buttonBR):
@@ -235,7 +234,6 @@ def pivotleft(angle):#maxTicks):
         
         #Return float
         goalAngle = (float(line) - angle)%360
-        print('Goal angle is '+str(goalAngle))
 
     while True:
         #print("counterBR = ", counterBR,"counterFL = ", counterFL, "BR state: ", gpio.input(12), "FL state: ", gpio.input(7))
@@ -250,7 +248,7 @@ def pivotleft(angle):#maxTicks):
         
         #Return float
         currAngle = float(line)
-        file.write(str(currAngle)+'\n')
+        #file.write(str(currAngle)+'\n')
         
         #file.write(str(counterBR)+","+str(counterFL)+","+str(gpio.input(12))+","+str(gpio.input(7))+'\n')
         if int(gpio.input(12)) != int(buttonBR):
@@ -378,6 +376,14 @@ def key_input(event):
 
 if __name__ == '__main__':
     read_trash = ser.readline()
+    line = ser.readline() #print(line)
+    line = line.rstrip().lstrip()
+    line = str(line)
+    line = line.strip("'")
+    line = line.strip("b'")
+    
+    currAngle = float(line)
+    file.write(str(currAngle)+','+'0.00'+'\n')
     while True:
         key_press = input("Select driving mode: ")
         if key_press == 'q':
